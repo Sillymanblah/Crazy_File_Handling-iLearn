@@ -63,17 +63,15 @@ namespace ANSI
         std::string color;
 
     private:
-        static std::string basic_color_tag( BASIC color );
-
         static std::string get_layer_code( LAYER layer );
 
         static std::string get_base_code( LAYER layer );
-
         static std::string get_base( LAYER layer );
 
         static std::string get_default( LAYER layer );
 
-        static std::string build_color_tag( COLOR_BYTE red, COLOR_BYTE green, COLOR_BYTE blue );
+        static std::string basic_color_code( BASIC color );
+        static std::string build_color_code( COLOR_BYTE red, COLOR_BYTE green, COLOR_BYTE blue );
 
         // Constructor from string to COLOR in private for usage in the build and get color functions.
         COLOR( const std::string& color_code ) : color(color_code) {}

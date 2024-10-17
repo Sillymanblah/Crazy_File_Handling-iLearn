@@ -10,8 +10,9 @@ namespace ANSI
 {
     enum class LAYER : BYTE
     {
-        FOREGROUND = 38,
-        BACKGROUND = 48,
+        FOREGROUND  = 38,
+        BACKGROUND  = 48,
+        UNDERLINE   = 58, // Can not be used in conjuction with any BASIC_COLORs except DEFAULT
     };
     // enum class LAYER
 
@@ -25,18 +26,25 @@ namespace ANSI
         INVERSE,
         HIDDEN,
         STRIKETHROUGH,
-
-        // Resetting bold or dim colors is the same code, so that is why they are both set to 22, the rest all increment from that.
+        DOUBLE_UNDERLINE = 21,
+        OVERLINE = 53,
+        SUPERSCRIPT = 73,
+        SUBSCRIPT = 74,
         
         RESET_ALL = 0,
-        RESET_BOLD = 22,
-        RESET_DIM = 22,
+        RESET_BOLD = 22, // Resetting bold or dim colors is the same code, so they are both set to 22.
+        RESET_DIM = 22, // Resetting bold or dim colors is the same code, so they are both set to 22.
         RESET_ITALIC,
-        RESET_UNDERLINE,
+        RESET_UNDERLINE, // Turns off underlines, including single and double, plus any colored underlines
         RESET_BLINKING,
         RESET_INVERSE,
         RESET_HIDDEN,
         RESET_STRIKETHROUGH,
+        RESET_OVERLINE = 55,
+        RESET_SCRIPT = 75, // Turns off subscript AND superscript
+
+        FRAME_OPEN = 51,
+        FRAME_CLOSE = 54,
     };
 
     // For basic colors, these are stored as an offset integer from the forground/background color mode.
@@ -54,6 +62,17 @@ namespace ANSI
         // We skip over the enumeration value of 0, because that code is not a color and is reserved for setting the color (using a byte or 3 byte RGB).
 
         DEFAULT = 1, // Default color is a reset of color to whatever the terminal default is.
+
+        // Furthermore, there are bright versions of all the basic colors found further down below:
+
+        BRIGHT_BLACK = 52,
+        BRIGHT_RED,
+        BRIGHT_GREEN,
+        BRIGHT_YELLOW,
+        BRIGHT_BLUE,
+        BRIGHT_MAGENTA,
+        BRIGHT_CYAN,
+        BRIGHT_WHITE,
     };
 
     class BYTE_COLOR
@@ -90,19 +109,16 @@ namespace ANSI
             static inline const unsigned char RGB_FORMAT    = 2;
             static inline const unsigned char BYTE_FORMAT   = 5;
             
-            enum class CONTROL : char
+            enum class BEGIN : char
             {
-                // This is the only sequence begin code, the rest all mark the end of the sequence
-                ESCAPE              = '\x1b',
-                // Control Sequence Introducer - always follows ESCAPE in any code
-                SEQUENCE_INTRO      = '[',
+                ESCAPE          = 27, // Escape key to start a command or sequence.
+                SEQUENCE_INTRO  = '[', // Control Sequence Introducer - almost always follows ESCAPE in ANSI codes.
+            };
 
-                COLOR               = 'm',
-                SET_MODE            = 'h',
-                UNSET_MODE          = 'l',
-                KEY_STRING          = 'p',
-                SCREEN_ERASE        = 'J',
-                LINE_ERASE          = 'K',
+            static inline const char BEGIN_CODE[2] = { (char)BEGIN::ESCAPE, (char)BEGIN::SEQUENCE_INTRO };
+            
+            enum class END : char
+            {
                 CURSOR_UP           = 'A',
                 CURSOR_DOWN         = 'B',
                 CURSOR_RIGHT        = 'C',
@@ -111,7 +127,13 @@ namespace ANSI
                 CURSOR_START_UP     = 'F',
                 CURSOR_TO_COLUMN    = 'G',
                 CURSOR_TO_POS       = 'H',
+                SCREEN_ERASE        = 'J',
+                LINE_ERASE          = 'K',
+                COLOR               = 'm',
+                SET_MODE            = 'h',
+                UNSET_MODE          = 'l',
                 GET_CURSOR_POS      = 'n',
+                KEY_STRING          = 'p',
             };
             // static inline enum class CONTROL
         };
@@ -128,6 +150,7 @@ namespace ANSI
 
     public:
         COMMAND() = delete;
+        COMMAND( EFFECT );
         COMMAND( LAYER, BASIC_COLOR );
         COMMAND( LAYER, BYTE_COLOR );
         COMMAND( LAYER, RGB_COLOR );

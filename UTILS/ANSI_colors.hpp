@@ -16,7 +16,7 @@ namespace ANSI
         {
             constexpr const char* BEGIN         = "\x1b[";
             constexpr const char* END           = "m";
-        } // namespace TAG
+        } // namespace CONTROL
 
         namespace LAYER
         {
@@ -34,7 +34,7 @@ namespace ANSI
             constexpr const char* YELLOW        = "255;255;0";
             constexpr const char* CYAN          = "0;255;255";
             constexpr const char* MAGENTA       = "255;0;255";
-        } // namespace TAG
+        } // namespace COLOR
         
     } // namespace CODE
 

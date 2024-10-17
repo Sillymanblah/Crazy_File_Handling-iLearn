@@ -63,7 +63,7 @@ namespace ANSI
         std::string color;
 
     private:
-        [[nodiscard]] static const char* basic_color_tag( BASIC color )
+        [[nodiscard]] static std::string basic_color_tag( BASIC color )
         {
             switch (color)
             {

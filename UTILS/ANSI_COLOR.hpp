@@ -63,37 +63,17 @@ namespace ANSI
         std::string color;
 
     private:
-        [[nodiscard]] static std::string basic_color_tag( BASIC color )
-        {
-            switch (color)
-            {
-                COLOR_CASE(BLACK);
-                COLOR_CASE(RED);
-                COLOR_CASE(GREEN);
-                COLOR_CASE(YELLOW);
-                COLOR_CASE(BLUE);
-                COLOR_CASE(MAGENTA);
-                COLOR_CASE(CYAN);
-                COLOR_CASE(WHITE);
+        static std::string basic_color_tag( BASIC color );
 
-                default: throw std::invalid_argument( "Color does not match the allowed values of the enumeration..." ); // Should never reach this, but if you do, fuck you.
-            }
-        }
+        static std::string get_layer_code( LAYER layer );
 
-        [[nodiscard]] static std::string get_layer_code( LAYER layer )
-        { return ( layer == LAYER::FOREGROUND ) ? CODE::LAYER::FOREGROUND : CODE::LAYER::BACKGROUND; }
+        static std::string get_base_code( LAYER layer );
 
-        [[nodiscard]] static std::string get_base_code( LAYER layer )
-        { return CODE::CONTROL::BEGIN + get_layer_code(layer); }
+        static std::string get_base( LAYER layer );
 
-        [[nodiscard]] static std::string get_base( LAYER layer )
-        { return get_base_code(layer) + CODE::SEPARATOR; }
+        static std::string get_default( LAYER layer );
 
-        [[nodiscard]] static std::string get_default( LAYER layer )
-        { return get_base_code(layer) + CODE::CONTROL::END; }
-
-        [[nodiscard]] static std::string build_color_tag( COLOR_BYTE red, COLOR_BYTE green, COLOR_BYTE blue )
-        { return std::to_string(red) + CODE::SEPARATOR + std::to_string(green) + CODE::SEPARATOR + std::to_string(blue); }
+        static std::string build_color_tag( COLOR_BYTE red, COLOR_BYTE green, COLOR_BYTE blue );
 
         // Constructor from string to COLOR in private for usage in the build and get color functions.
         COLOR( const std::string& color_code ) : color(color_code) {}
@@ -104,11 +84,9 @@ namespace ANSI
         COLOR( const COLOR& ) = default;
         COLOR( COLOR&& ) = default;
 
-        [[nodiscard]] friend COLOR get_basic_color( COLOR::BASIC color, LAYER level = ANSI::LAYER::FOREGROUND )
-        { return get_base(level) + basic_color_tag(color) + CODE::CONTROL::END; }
+        friend COLOR get_basic_color( COLOR::BASIC color, LAYER level = ANSI::LAYER::FOREGROUND );
 
-        [[nodiscard]] friend COLOR build_color( COLOR_BYTE red, COLOR_BYTE green, COLOR_BYTE blue, LAYER level = ANSI::LAYER::FOREGROUND )
-        { return get_base(level) + build_color_tag(red, green, blue) + CODE::CONTROL::END; }
+        friend COLOR build_color( COLOR_BYTE red, COLOR_BYTE green, COLOR_BYTE blue, LAYER level = ANSI::LAYER::FOREGROUND );
     };
 
 } // namespace ANSI

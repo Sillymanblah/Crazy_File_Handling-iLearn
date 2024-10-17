@@ -83,8 +83,11 @@ namespace ANSI
         [[nodiscard]] static std::string get_layer_code( LAYER layer )
         { return ( layer == LAYER::FOREGROUND ) ? CODE::LAYER::FOREGROUND : CODE::LAYER::BACKGROUND; }
 
+        [[nodiscard]] static std::string get_base_code( LAYER layer )
+        { return CODE::CONTROL::BEGIN + get_layer_code( layer ); }
+
         [[nodiscard]] static std::string get_base( LAYER layer )
-        { return CODE::CONTROL::BEGIN + get_layer_code(layer) + CODE::SEPARATOR; }
+        { return get_base_code(layer) + CODE::SEPARATOR; }
 
         [[nodiscard]] static std::string build_color_tag( COLOR_BYTE red, COLOR_BYTE green, COLOR_BYTE blue )
         { return std::to_string(red) + CODE::SEPARATOR + std::to_string(green) + CODE::SEPARATOR + std::to_string(blue); }

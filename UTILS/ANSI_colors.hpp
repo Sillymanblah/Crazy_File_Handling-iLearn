@@ -84,10 +84,13 @@ namespace ANSI
         { return ( layer == LAYER::FOREGROUND ) ? CODE::LAYER::FOREGROUND : CODE::LAYER::BACKGROUND; }
 
         [[nodiscard]] static std::string get_base_code( LAYER layer )
-        { return CODE::CONTROL::BEGIN + get_layer_code( layer ); }
+        { return CODE::CONTROL::BEGIN + get_layer_code(layer); }
 
         [[nodiscard]] static std::string get_base( LAYER layer )
         { return get_base_code(layer) + CODE::SEPARATOR; }
+
+        [[nodiscard]] static std::string get_default( LAYER layer )
+        { return get_base_code(layer) + CODE::CONTROL::END; }
 
         [[nodiscard]] static std::string build_color_tag( COLOR_BYTE red, COLOR_BYTE green, COLOR_BYTE blue )
         { return std::to_string(red) + CODE::SEPARATOR + std::to_string(green) + CODE::SEPARATOR + std::to_string(blue); }
@@ -97,11 +100,7 @@ namespace ANSI
         COLOR( std::string&& color_code ) : color(color_code) {}
 
     public:
-        COLOR() : color()
-        {
-            color += std::string( CODE::CONTROL::BEGIN ) + CODE::LAYER::FOREGROUND + CODE::CONTROL::END; // default foreground
-            color += std::string( CODE::CONTROL::BEGIN ) + CODE::LAYER::BACKGROUND + CODE::CONTROL::END; // default background
-        }
+        COLOR() : color( get_default( LAYER::BACKGROUND ) + get_default( LAYER::FOREGROUND ) ) {}
         COLOR( const COLOR& ) = default;
         COLOR( COLOR&& ) = default;
 

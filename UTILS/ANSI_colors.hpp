@@ -104,13 +104,7 @@ namespace ANSI
         [[nodiscard]] friend COLOR get_basic_color( COLOR::BASIC color, LAYER level = ANSI::LAYER::FOREGROUND )
         { return get_base(level) + basic_color_tag(color) + CODE::CONTROL::END; }
 
-        [[nodiscard]] friend COLOR build_color
-        (
-            COLOR_BYTE red,
-            COLOR_BYTE green,
-            COLOR_BYTE blue,
-            LAYER level = ANSI::LAYER::FOREGROUND
-        )
+        [[nodiscard]] friend COLOR build_color( COLOR_BYTE red, COLOR_BYTE green, COLOR_BYTE blue, LAYER level = ANSI::LAYER::FOREGROUND )
         { return get_base(level) + build_color_tag(red, green, blue) + CODE::CONTROL::END; }
     };
 

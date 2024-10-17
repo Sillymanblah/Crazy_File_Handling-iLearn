@@ -78,9 +78,12 @@ namespace ANSI
                 default: throw std::invalid_argument( "Color does not match the allowed values of the enumeration..." ); // Should never reach this, but if you do, fuck you.
             }
         }
+
+        [[nodiscard]] static std::string get_layer_code( LAYER layer )
+        { return std::string( CODE::CONTROL::BEGIN ) + ( ( layer == LAYER::FOREGROUND ) ? CODE::LAYER::FOREGROUND : CODE::LAYER::BACKGROUND ); }
         
         [[nodiscard]] static std::string get_base( LAYER layer )
-        { return std::string( CODE::CONTROL::BEGIN ) + ( ( layer == LAYER::FOREGROUND ) ? CODE::LAYER::FOREGROUND : CODE::LAYER::BACKGROUND ) + ';'; }
+        { return get_layer_code( layer ) + ';'; }
 
         [[nodiscard]] static std::string build_color_tag( COLOR_BYTE red, COLOR_BYTE green, COLOR_BYTE blue )
         { return std::to_string(red) + ';' + std::to_string(green) + ';' + std::to_string(blue); }
@@ -92,8 +95,8 @@ namespace ANSI
     public:
         COLOR() : color()
         {
-            color += std::string( CODE::CONTROL::BEGIN ) + "39;2" + CODE::CONTROL::END; // default foreground
-            color += std::string( CODE::CONTROL::BEGIN ) + "49;2" + CODE::CONTROL::END; // default background
+            color += std::string( CODE::CONTROL::BEGIN ) + CODE::LAYER::FOREGROUND + CODE::CONTROL::END; // default foreground
+            color += std::string( CODE::CONTROL::BEGIN ) + CODE::LAYER::BACKGROUND + CODE::CONTROL::END; // default background
         }
         COLOR( const COLOR& ) = default;
         COLOR( COLOR&& ) = default;

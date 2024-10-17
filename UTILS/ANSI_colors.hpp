@@ -36,6 +36,7 @@ namespace ANSI
             constexpr const char* MAGENTA       = "255;0;255";
         } // namespace COLOR
         
+        constexpr const char SEPARATOR          = ';';
     } // namespace CODE
 
     enum class LAYER : bool
@@ -80,13 +81,13 @@ namespace ANSI
         }
 
         [[nodiscard]] static std::string get_layer_code( LAYER layer )
-        { return std::string( CODE::CONTROL::BEGIN ) + ( ( layer == LAYER::FOREGROUND ) ? CODE::LAYER::FOREGROUND : CODE::LAYER::BACKGROUND ); }
-        
+        { return ( layer == LAYER::FOREGROUND ) ? CODE::LAYER::FOREGROUND : CODE::LAYER::BACKGROUND; }
+
         [[nodiscard]] static std::string get_base( LAYER layer )
-        { return get_layer_code( layer ) + ';'; }
+        { return CODE::CONTROL::BEGIN + get_layer_code(layer) + CODE::SEPARATOR; }
 
         [[nodiscard]] static std::string build_color_tag( COLOR_BYTE red, COLOR_BYTE green, COLOR_BYTE blue )
-        { return std::to_string(red) + ';' + std::to_string(green) + ';' + std::to_string(blue); }
+        { return std::to_string(red) + CODE::SEPARATOR + std::to_string(green) + CODE::SEPARATOR + std::to_string(blue); }
 
         // Constructor from string to COLOR in private for usage in the build and get color functions.
         COLOR( const std::string& color_code ) : color(color_code) {}

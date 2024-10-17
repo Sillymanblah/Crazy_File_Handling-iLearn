@@ -4,63 +4,118 @@
 #include <string>
 #include <stdexcept>
 
-#define COLOR_CASE(color) case BASIC::color : return CODE::COLOR::color;
+typedef unsigned char BYTE;
 
 namespace ANSI
 {
-    typedef unsigned char COLOR_BYTE;
-
-    namespace CODE
+    enum class LAYER : BYTE
     {
-        namespace CONTROL
-        {
-            constexpr const char* BEGIN         = "\x1b[";
-            constexpr const char* END           = "m";
-        } // namespace CONTROL
+        FOREGROUND = 38,
+        BACKGROUND = 48,
+    };
+    // enum class LAYER
 
-        namespace LAYER
-        {
-            constexpr const char* FOREGROUND    = "38;2";
-            constexpr const char* BACKGROUND    = "48;2";
-        } // namespace LAYER
+    enum class EFFECT : BYTE
+    {
+        BOLD = 1,
+        DIM,
+        ITALIC,
+        UNDERLINE,
+        BLINKING,
+        INVERSE,
+        HIDDEN,
+        STRIKETHROUGH,
 
-        namespace COLOR
-        {
-            constexpr const char* BLACK         = "0;0;0";
-            constexpr const char* WHITE         = "255;255;255";
-            constexpr const char* RED           = "255;0;0";
-            constexpr const char* GREEN         = "0;255;0";
-            constexpr const char* BLUE          = "0;0;255";
-            constexpr const char* YELLOW        = "255;255;0";
-            constexpr const char* CYAN          = "0;255;255";
-            constexpr const char* MAGENTA       = "255;0;255";
-        } // namespace COLOR
+        // Resetting bold or dim colors is the same code, so that is why they are both set to 22, the rest all increment from that.
         
-        constexpr const char SEPARATOR          = ';';
-    } // namespace CODE
-
-    enum class LAYER : bool
-    {
-        FOREGROUND = 0,
-        BACKGROUND = 1,
+        RESET_ALL = 0,
+        RESET_BOLD = 22,
+        RESET_DIM = 22,
+        RESET_ITALIC,
+        RESET_UNDERLINE,
+        RESET_BLINKING,
+        RESET_INVERSE,
+        RESET_HIDDEN,
+        RESET_STRIKETHROUGH,
     };
 
-    class COLOR
+    // For basic colors, these are stored as an offset integer from the forground/background color mode.
+    enum class BASIC_COLOR : int
+    {
+        BLACK = -8,
+        RED,
+        GREEN,
+        YELLOW,
+        BLUE,
+        MAGENTA,
+        CYAN,
+        WHITE,
+        
+        // We skip over the enumeration value of 0, because that code is not a color and is reserved for setting the color (using a byte or 3 byte RGB).
+
+        DEFAULT = 1, // Default color is a reset of color to whatever the terminal default is.
+    };
+
+    class BYTE_COLOR
     {
     public:
-        enum class BASIC : unsigned char
+        BYTE_COLOR( BYTE __value );
+        BYTE_COLOR( BYTE_COLOR&& ) = default;
+        BYTE_COLOR( const BYTE_COLOR& ) = default;
+
+    private:
+        BYTE _code;
+    };
+    
+    class RGB_COLOR
+    {
+    public:
+        RGB_COLOR( BYTE __red, BYTE __green, BYTE __blue ) : _red(__red), _green(__green), _blue(__blue) {}
+        RGB_COLOR( RGB_COLOR&& ) = default;
+        RGB_COLOR( const RGB_COLOR& ) = default;
+
+    private:
+        BYTE _red;
+        BYTE _green;
+        BYTE _blue;
+    };
+
+    class COMMAND
+    {
+    private:
+        // The below section cannot be a namespace anymore because they are stored inside of a class.
+        struct CODE
         {
-            BLACK,
-            RED,
-            GREEN,
-            YELLOW,
-            BLUE,
-            MAGENTA,
-            CYAN,
-            WHITE,
+            static inline const char DELIMITER              = ';';
+            static inline const unsigned char RGB_FORMAT    = 2;
+            static inline const unsigned char BYTE_FORMAT   = 5;
+            
+            enum class CONTROL : char
+            {
+                // This is the only sequence begin code, the rest all mark the end of the sequence
+                ESCAPE              = '\x1b',
+                // Control Sequence Introducer - always follows ESCAPE in any code
+                SEQUENCE_INTRO      = '[',
+
+                COLOR               = 'm',
+                SET_MODE            = 'h',
+                UNSET_MODE          = 'l',
+                KEY_STRING          = 'p',
+                SCREEN_ERASE        = 'J',
+                LINE_ERASE          = 'K',
+                CURSOR_UP           = 'A',
+                CURSOR_DOWN         = 'B',
+                CURSOR_RIGHT        = 'C',
+                CURSOR_LEFT         = 'D',
+                CURSOR_START_DOWN   = 'E',
+                CURSOR_START_UP     = 'F',
+                CURSOR_TO_COLUMN    = 'G',
+                CURSOR_TO_POS       = 'H',
+                GET_CURSOR_POS      = 'n',
+            };
+            // static inline enum class CONTROL
         };
-        
-        std::string color;
+        // struct CODE
 
     private:
         static std::string get_layer_code( LAYER layer );
@@ -70,23 +125,23 @@ namespace ANSI
 
         static std::string get_default( LAYER layer );
 
-        static std::string basic_color_code( BASIC color );
-        static std::string build_color_code( COLOR_BYTE red, COLOR_BYTE green, COLOR_BYTE blue );
-
-        // Constructor from string to COLOR in private for usage in the build and get color functions.
-        COLOR( const std::string& color_code ) : color(color_code) {}
-        COLOR( std::string&& color_code ) : color(color_code) {}
 
     public:
-        COLOR() : color( get_default( LAYER::BACKGROUND ) + get_default( LAYER::FOREGROUND ) ) {}
-        COLOR( const COLOR& ) = default;
-        COLOR( COLOR&& ) = default;
+        COMMAND() = delete;
+        COMMAND( LAYER, BASIC_COLOR );
+        COMMAND( LAYER, BYTE_COLOR );
+        COMMAND( LAYER, RGB_COLOR );
+        COMMAND( const COMMAND& ) = default;
+        COMMAND( COMMAND&& ) = default;
 
-        friend COLOR get_basic_color( COLOR::BASIC color, LAYER level = ANSI::LAYER::FOREGROUND );
+        friend std::ostream& operator << ( std::ostream& output, const COMMAND& command );
+        friend std::ostream& operator << ( std::ostream& output, COMMAND&& command );
 
-        friend COLOR build_color( COLOR_BYTE red, COLOR_BYTE green, COLOR_BYTE blue, LAYER level = ANSI::LAYER::FOREGROUND );
+    private:
+        BYTE* commands;
     };
-
-} // namespace ANSI
+    // class COMMAND
+}
+// namespace ANSI
 
 #endif // ANSI_COLORS_HPP

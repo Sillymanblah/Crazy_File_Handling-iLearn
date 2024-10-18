@@ -10,7 +10,7 @@ int main()
 
     std::cout << ANSI::BACKGROUND::CYAN << ANSI::TEXT::EFFECTS::BOLD_ON << ANSI::TEXT::BRIGHT_YELLOW << "Who let the dogs out?\n";
 
-    std::cout << ANSI::FULL_RESET << "I am back to normal!\n";
+    std::cout << ANSI::DEFAULT << "I am back to normal!\n";
 
     std::cout << ANSI::COMMAND( ANSI::LAYER::BACKGROUND, ANSI::RGB_COLOR( 50, 80, 10 ) ) << "Some kind of gross green, maybe...\n";
 

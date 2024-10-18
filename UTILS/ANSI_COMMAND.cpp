@@ -27,8 +27,7 @@ namespace ANSI
             if ( index < num_commands - 1 ) output << ANSI::COMMAND::CODE::DELIMITER;
         }
 
-        output << command.closing_tag;
-        return output;
+        return output << command.closing_tag;
     }
     std::ostream& operator << ( std::ostream& output, ANSI::COMMAND&& command )
     {
@@ -41,9 +40,8 @@ namespace ANSI
             if ( index < num_commands - 1 ) output << ANSI::COMMAND::CODE::DELIMITER;
         }
         
-        output << command.closing_tag;
-        return output;
+        return output << command.closing_tag;
     }
+    
 };
-
 // namespace ANSI

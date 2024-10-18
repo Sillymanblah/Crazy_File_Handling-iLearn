@@ -1,5 +1,6 @@
-#ifndef ANSI_COLORS_HPP
-#define ANSI_COLORS_HPP
+#pragma once
+#ifndef ANSI_COMMAND_HPP
+#define ANSI_COMMAND_HPP
 
 #include <ostream>
 #include <string>

@@ -1,8 +1,10 @@
 #ifndef ANSI_COLORS_HPP
 #define ANSI_COLORS_HPP
 
+#include <ostream>
 #include <string>
 #include <stdexcept>
+#include <vector>
 
 typedef unsigned char BYTE;
 
@@ -233,7 +235,8 @@ namespace ANSI
         friend std::ostream& operator << ( std::ostream& output, COMMAND&& command );
 
     private:
-        BYTE* commands;
+        std::vector< BYTE > codes;
+        CODE::END closing_tag;
     };
     // class COMMAND
 }

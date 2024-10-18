@@ -1,6 +1,7 @@
 #ifndef ILEARN_TIME_HPP
 #define ILEARN_TIME_HPP
 
+#include <cstdint>
 #include <sstream>
 #include <string>
 

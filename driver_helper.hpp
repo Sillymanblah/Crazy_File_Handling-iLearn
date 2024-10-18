@@ -5,6 +5,7 @@
 #include "./database/database.hpp"
 #include "./student_databases/student.hpp"
 
+#include <cstdint>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -53,6 +54,7 @@ void validate( int argc, const char** argv )
     if (!check_filename(argv[2], ".html")) throw USAGE::bad_html_file;
     if (!check_filename(argv[3], ".csv")) throw USAGE::bad_csv_file;
     if (!check_filename(argv[4], ".csv")) throw USAGE::bad_csv_file;
+    std::cout << "Validated!";
 }
 
 void create_file(const char* filename)

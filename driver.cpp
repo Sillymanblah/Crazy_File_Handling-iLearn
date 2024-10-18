@@ -1,4 +1,4 @@
-#include "./UTILS/ANSI_COLOR.hpp"
+#include "./UTILS/ANSI.hpp"
 #include "./driver_helper.hpp"
 #include "./html_parser/html_parsing.hpp"
 #include "./student_databases/student.hpp"
@@ -53,7 +53,7 @@ header_set student_email_database::determine_headers_manually()
     return result;
 }
 
-int main(const int argc, const char** argv)
+int main( const int argc, const char** argv )
 {
     std::filesystem::path curr = "C:\\Users\\John\\OneDrive\\Documents\\School\\3rd Year - Spring\\CSC 1310 - TA Job\\Working\\temp\\grading";
     std::string deadline;
@@ -114,11 +114,11 @@ int main(const int argc, const char** argv)
             _submission_database.data_base[id].print_with_colors (
                 std::cout,
                 ilearn_time::get_minutes(deadline),
-                get_basic_color(ANSI::COLOR::BASIC::YELLOW),
-                get_basic_color(ANSI::COLOR::BASIC::GREEN),
-                get_basic_color(ANSI::COLOR::BASIC::RED),
-                get_basic_color(ANSI::COLOR::BASIC::CYAN),
-                get_basic_color(ANSI::COLOR::BASIC::BLUE)
+                ANSI::TEXT::BRIGHT_YELLOW,
+                ANSI::TEXT::GREEN,
+                ANSI::TEXT::RED,
+                ANSI::TEXT::BRIGHT_CYAN,
+                ANSI::TEXT::MAGENTA
             );
         }
 

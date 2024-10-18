@@ -2,7 +2,7 @@
 #define STUDENT_SUBMISSIONS_HPP
 
 #include "../UTILS/ilearn_time.hpp"
-#include "../UTILS/ANSI_COLOR.hpp"
+#include "../UTILS/ANSI.hpp"
 #include "./student.hpp"
 #include "../html_parser/html_parsing.hpp"
 
@@ -38,37 +38,36 @@ struct submission
     }
 
     submission() = default;
-    submission(const submission&) = default;
-    submission(submission&&) = default;
-    submission(const parsed_string& _data)
-    { handle_parsed_data(_data); }
+    submission( const submission& ) = default;
+    submission( submission&& ) = default;
+    submission( const parsed_string& _data )
+    { handle_parsed_data( _data ); }
 
-    submission& operator =(const submission&) = default;
-    submission& operator =(submission&&) = default;
-    submission& operator =(const parsed_string& _data)
-    { handle_parsed_data(_data); return *this; }
+    submission& operator =( const submission& ) = default;
+    submission& operator =( submission&& ) = default;
+    submission& operator =( const parsed_string& _data )
+    { handle_parsed_data( _data ); return *this; }
 
     void print_with_colors (
         std::ostream& output,
         uint32_t deadline = -1,
-        ANSI::COLOR on_time = ANSI::COLOR(),
-        ANSI::COLOR late = ANSI::COLOR(),
-        ANSI::COLOR comments = ANSI::COLOR(),
-        ANSI::COLOR date = ANSI::COLOR()
+        ANSI::COMMAND on_time = ANSI::TEXT::DEFAULT,
+        ANSI::COMMAND late = ANSI::TEXT::DEFAULT,
+        ANSI::COMMAND comments = ANSI::TEXT::DEFAULT,
+        ANSI::COMMAND date = ANSI::TEXT::DEFAULT
     )
     {
-        ANSI::COLOR defaulted;
-        output << (time < deadline ? on_time.color : late.color) << title << std::endl;
-        output << defaulted.color << "\tComments:\n" << comments.color;
-        for (std::string& comment : this->comments)
+        output << ( time < deadline ? on_time : late ) << title << std::endl;
+        output << ANSI::FULL_RESET << "\tComments:\n" << comments;
+        for ( std::string& comment : this->comments )
             output << "\t\t\"" << comment << "\"\n";
-        if (this->comments.size() == 0) output << "\t\tNone!\n";
-        output << defaulted.color << "\tSubmitted:\n\t\t" << date.color << ilearn_time::get_date_time(time) << '\n';
+        if ( this->comments.size() == 0 ) output << "\t\tNone!\n";
+        output << ANSI::FULL_RESET << "\tSubmitted:\n\t\t" << date << ilearn_time::get_date_time( time ) << '\n';
     }
 
-    friend std::ostream& operator <<(std::ostream& output, submission data)
+    friend std::ostream& operator << ( std::ostream& output, submission data )
     {
-        data.print_with_colors(output); // Nothing in, prints black and white.
+        data.print_with_colors( output ); // Nothing in, prints black and white.
         return output;
     }
 
@@ -146,20 +145,19 @@ public:
     void print_with_colors (
         std::ostream& output,
         uint32_t deadline = -1,
-        ANSI::COLOR student = ANSI::COLOR(),
-        ANSI::COLOR on_time = ANSI::COLOR(),
-        ANSI::COLOR late = ANSI::COLOR(),
-        ANSI::COLOR comments = ANSI::COLOR(),
-        ANSI::COLOR date = ANSI::COLOR()
+        ANSI::COMMAND student = ANSI::TEXT::DEFAULT,
+        ANSI::COMMAND on_time = ANSI::TEXT::DEFAULT,
+        ANSI::COMMAND late = ANSI::TEXT::DEFAULT,
+        ANSI::COMMAND comments = ANSI::TEXT::DEFAULT,
+        ANSI::COMMAND date = ANSI::TEXT::DEFAULT
     )
     {
-        ANSI::COLOR defaulted;
-        output << student.color << _student.last_name << ',' << _student.first_name << ":\n" << defaulted.color;
+        output << student << _student.last_name << ',' << _student.first_name << ":\n" << ANSI::FULL_RESET;
         
         for (submission& _submission : _submissions)
             _submission.print_with_colors(output, deadline, on_time, late, comments, date);
         
-        output << defaulted.color;
+        output << ANSI::FULL_RESET;
     }
     const student_name& get_student_name()
     { return _student; }

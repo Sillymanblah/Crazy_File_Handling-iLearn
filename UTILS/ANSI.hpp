@@ -152,6 +152,8 @@ namespace ANSI
 
     private:
         BYTE _code;
+
+        friend class COMMAND;
     };
     
     class RGB_COLOR
@@ -165,6 +167,8 @@ namespace ANSI
         BYTE _red;
         BYTE _green;
         BYTE _blue;
+
+        friend class COMMAND;
     };
 
     class COMMAND
@@ -177,7 +181,7 @@ namespace ANSI
             static inline const unsigned char RGB_FORMAT    = 2;
             static inline const unsigned char BYTE_FORMAT   = 5;
             
-            enum class BEGIN : char
+            enum BEGIN : char
             {
                 ESCAPE          = 27, // Escape key to start a command or sequence.
                 SEQUENCE_INTRO  = '[', // Control Sequence Introducer - almost always follows ESCAPE in ANSI codes.
@@ -185,7 +189,7 @@ namespace ANSI
 
             static inline const char BEGIN_CODE[2] = { (char)BEGIN::ESCAPE, (char)BEGIN::SEQUENCE_INTRO };
             
-            enum class END : char
+            enum END : char
             {
                 CURSOR_UP           = 'A',
                 CURSOR_DOWN         = 'B',
@@ -197,7 +201,7 @@ namespace ANSI
                 CURSOR_TO_POS       = 'H',
                 SCREEN_ERASE        = 'J',
                 LINE_ERASE          = 'K',
-                COLOR               = 'm',
+                TEXT                = 'm',
                 SET_MODE            = 'h',
                 UNSET_MODE          = 'l',
                 GET_CURSOR_POS      = 'n',

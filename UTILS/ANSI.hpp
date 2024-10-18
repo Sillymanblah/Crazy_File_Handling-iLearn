@@ -78,9 +78,77 @@ namespace ANSI
     class BYTE_COLOR
     {
     public:
-        BYTE_COLOR( BYTE __value );
+        enum BASIC : BYTE
+        {
+            OFF_BLACK,
+            RED,
+            GREEN,
+            YELLOW,
+            BLUE,
+            MAGENTA,
+            CYAN,
+            OFF_WHITE,
+            BRIGHT_BLACK,
+            BRIGHT_RED,
+            BRIGHT_GREEN,
+            BRIGHT_YELLOW,
+            BRIGHT_BLUE,
+            BRIGHT_MAGENTA,
+            BRIGHT_CYAN,
+            BRIGHT_WHITE,
+        };
+
+        enum GRAYSCALE : BYTE
+        {
+            BLACK = 232,
+            LIGHT_BLACK,
+            LIGHTER_BLACK,
+            LIGHTEST_BLACK,
+            DARKEST_DARK_GRAY,
+            DARKER_DARK_GRAY,
+            DARK_GRAY,
+            LIGHTER_DARK_GRAY,
+            LIGHTEST_DARK_GRAY,
+            DARKEST_GRAY,
+            DARKER_GRAY,
+            GRAY,
+            LIGHTER_GRAY,
+            LIGHTEST_GRAY,
+            DARKEST_LIGHT_GRAY,
+            DARKER_LIGHT_GRAY,
+            LIGHT_GRAY,
+            LIGHTER_LIGHT_GRAY,
+            LIGHTEST_LIGHT_GRAY,
+            DARKEST_WHITE,
+            DARKER_WHITE,
+            DARK_WHITE,
+            WHITE,
+            BRILLIANT_WHITE, // Needed one more name...
+        };
+
+    public:
+        BYTE_COLOR( BYTE __value ) : _code(__value) {}
         BYTE_COLOR( BYTE_COLOR&& ) = default;
         BYTE_COLOR( const BYTE_COLOR& ) = default;
+
+    private:
+        // enumeration for use in the RGB code function.
+        enum RGB : BYTE
+        {
+            TRUE_BLACK      = 16, // The starting point for the RGB increment section of the colors
+
+            BLUE_INC        = 1, // Incremental steps for blue.
+            GREEN_INC       = 6, // Incremental steps for green.
+            RED_INC         = 36, // Incremental steps for red.
+        };
+
+    public:
+        /// @brief Function takes a set of values for an RGB code to retrieve a code for the value.
+        /// @param __red    A byte value for the desired saturation of the red color, will be condensed down to the range 0-5.
+        /// @param __green  A byte value for the desired saturation of the green color, will be condensed down to the range 0-5.
+        /// @param __blue   A byte value for the desired saturation of the blue color, will be condensed down to the range 0-5.
+        /// @return A @c BYTE value to the desired code for the given RGB value.
+        static inline BYTE rgb_code( BYTE __red, BYTE __green, BYTE __blue );
 
     private:
         BYTE _code;

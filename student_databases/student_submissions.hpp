@@ -51,18 +51,18 @@ struct submission
     void print_with_colors (
         std::ostream& output,
         uint32_t deadline = -1,
-        ANSI::COMMAND on_time = ANSI::TEXT::DEFAULT,
-        ANSI::COMMAND late = ANSI::TEXT::DEFAULT,
-        ANSI::COMMAND comments = ANSI::TEXT::DEFAULT,
-        ANSI::COMMAND date = ANSI::TEXT::DEFAULT
+        ANSI::COMMANDS on_time = ANSI::DEFAULT,
+        ANSI::COMMANDS late = ANSI::DEFAULT,
+        ANSI::COMMANDS comments = ANSI::DEFAULT,
+        ANSI::COMMANDS date = ANSI::DEFAULT
     )
     {
         output << ( time < deadline ? on_time : late ) << title << std::endl;
-        output << ANSI::FULL_RESET << "\tComments:\n" << comments;
+        output << ANSI::RESET << "\tComments:\n" << comments;
         for ( std::string& comment : this->comments )
             output << "\t\t\"" << comment << "\"\n";
         if ( this->comments.size() == 0 ) output << "\t\tNone!\n";
-        output << ANSI::FULL_RESET << "\tSubmitted:\n\t\t" << date << ilearn_time::get_date_time( time ) << '\n';
+        output << ANSI::RESET << "\tSubmitted:\n\t\t" << date << ilearn_time::get_date_time( time ) << '\n';
     }
 
     friend std::ostream& operator << ( std::ostream& output, submission data )
@@ -145,19 +145,19 @@ public:
     void print_with_colors (
         std::ostream& output,
         uint32_t deadline = -1,
-        ANSI::COMMAND student = ANSI::TEXT::DEFAULT,
-        ANSI::COMMAND on_time = ANSI::TEXT::DEFAULT,
-        ANSI::COMMAND late = ANSI::TEXT::DEFAULT,
-        ANSI::COMMAND comments = ANSI::TEXT::DEFAULT,
-        ANSI::COMMAND date = ANSI::TEXT::DEFAULT
+        ANSI::COMMANDS student = ANSI::DEFAULT,
+        ANSI::COMMANDS on_time = ANSI::DEFAULT,
+        ANSI::COMMANDS late = ANSI::DEFAULT,
+        ANSI::COMMANDS comments = ANSI::DEFAULT,
+        ANSI::COMMANDS date = ANSI::DEFAULT
     )
     {
-        output << student << _student.last_name << ',' << _student.first_name << ":\n" << ANSI::FULL_RESET;
+        output << student << _student.last_name << ',' << _student.first_name << ":\n" << ANSI::RESET;
         
         for (submission& _submission : _submissions)
             _submission.print_with_colors(output, deadline, on_time, late, comments, date);
         
-        output << ANSI::FULL_RESET;
+        output << ANSI::RESET;
     }
     const student_name& get_student_name()
     { return _student; }

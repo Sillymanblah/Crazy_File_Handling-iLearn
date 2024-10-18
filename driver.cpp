@@ -114,11 +114,11 @@ int main( const int argc, const char** argv )
             _submission_database.data_base[id].print_with_colors (
                 std::cout,
                 ilearn_time::get_minutes(deadline),
-                ANSI::TEXT::BRIGHT_YELLOW,
-                ANSI::TEXT::GREEN,
-                ANSI::TEXT::RED,
-                ANSI::TEXT::BRIGHT_CYAN,
-                ANSI::TEXT::MAGENTA
+                { ANSI::TEXT::BRIGHT_YELLOW }, // These now have to be wrapped, because we can also pair in other commands, such as highlights/backgrounds.
+                { ANSI::TEXT::GREEN, ANSI::TEXT::EFFECTS::UNDERLINE_ON },
+                { ANSI::TEXT::RED },
+                { ANSI::TEXT::BRIGHT_CYAN, ANSI::COMMAND( ANSI::LAYER::BACKGROUND, ANSI::BYTE_COLOR::GRAYSCALE::DARKER_WHITE ) },
+                { ANSI::TEXT::MAGENTA, ANSI::TEXT::EFFECTS::BOLD_ON }
             );
         }
 

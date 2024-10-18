@@ -248,6 +248,22 @@ namespace ANSI
         CODE::END closing_tag;
     };
     // class COMMAND
+
+    class COMMANDS : public std::vector< COMMAND >
+    {
+    public:
+        using _MyStorage    = std::vector< COMMAND >;
+        using allocator_type        = typename _MyStorage::allocator_type;
+
+        COMMANDS() : _MyStorage() {}
+        COMMANDS( COMMANDS&& __other ) : _MyStorage( std::forward< COMMANDS >( __other ) ) {}
+        COMMANDS( const COMMANDS& __other ) : _MyStorage( __other ) {}
+        COMMANDS( std::initializer_list< COMMAND > __command_list ) : _MyStorage( __command_list.begin(), __command_list.end() ) {}
+
+        friend std::ostream& operator << ( std::ostream& output, const COMMANDS& commands );
+        friend std::ostream& operator << ( std::ostream& output, COMMANDS&& commands );
+    };
+    // class COMMANDS
 }
 // namespace ANSI
 

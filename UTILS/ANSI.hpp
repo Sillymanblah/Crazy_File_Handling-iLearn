@@ -66,6 +66,8 @@ namespace ANSI
             static inline COMMAND SUB_ON        = COMMAND( EFFECT::SUBSCRIPT );
             static inline COMMAND SUPER_ON      = COMMAND( EFFECT::SUPERSCRIPT );
             static inline COMMAND SCRIPTS_OFF   = COMMAND( EFFECT::RESET_SCRIPT );
+
+            static inline COMMAND& DEFAULT      = RESET;
         }
         // namespace EFFECTS
     }
@@ -95,8 +97,12 @@ namespace ANSI
     }
     // namespace BACKGROUND
 
+    /// @deprecated Instead use either @c static @c inline @c COMMANDS variable @c ANSI::DEFAULT or @c ANSI::RESET.
     static inline std::ostream& FULL_RESET( std::ostream& output )
     { return output << TEXT::RESET << TEXT::EFFECTS::RESET << BACKGROUND::RESET; }
+
+    static inline COMMANDS DEFAULT  = { TEXT::DEFAULT, TEXT::EFFECTS::DEFAULT, BACKGROUND::DEFAULT };
+    static inline COMMANDS& RESET   = DEFAULT;
 }
 // namespace ANSI
 

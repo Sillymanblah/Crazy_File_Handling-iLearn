@@ -43,5 +43,15 @@ namespace ANSI
         return output << command.closing_tag;
     }
     
+    std::ostream& operator << ( std::ostream& output, const COMMANDS& commands )
+    {
+        for ( const COMMAND& command : commands ) output << command;
+        return output;
+    }
+    std::ostream& operator << ( std::ostream& output, COMMANDS&& commands )
+    {
+        for ( COMMAND& command : commands ) output << command;
+        return output;
+    }
 };
 // namespace ANSI

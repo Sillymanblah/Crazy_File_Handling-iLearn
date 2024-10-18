@@ -195,6 +195,7 @@ namespace ANSI
             {
                 ESCAPE          = 27, // Escape key to start a command or sequence.
                 SEQUENCE_INTRO  = '[', // Control Sequence Introducer - almost always follows ESCAPE in ANSI codes.
+                CSI             = '\x9B', // Is considered to be able to do the job of both, but is not as consistent.
             };
 
             static inline const char BEGIN_CODE[2] = { (char)BEGIN::ESCAPE, (char)BEGIN::SEQUENCE_INTRO };

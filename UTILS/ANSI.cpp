@@ -18,20 +18,29 @@ namespace ANSI
 
     std::ostream& operator << ( std::ostream& output, const ANSI::COMMAND& command )
     {
-        output << ANSI::COMMAND::CODE::BEGIN_CODE;
-        for ( const BYTE& code : command.codes )
-            output << code;
+        output << ANSI::COMMAND::CODE::BEGIN::ESCAPE << ANSI::COMMAND::CODE::BEGIN::SEQUENCE_INTRO;
+        
+        size_t num_commands = command.codes.size();
+        for ( size_t index = 0; index < num_commands; ++index )
+        {
+            output << (int)command.codes[index];
+            if ( index < num_commands - 1 ) output << ANSI::COMMAND::CODE::DELIMITER;
+        }
+
         output << command.closing_tag;
         return output;
     }
     std::ostream& operator << ( std::ostream& output, ANSI::COMMAND&& command )
     {
-        output << ANSI::COMMAND::CODE::BEGIN::ESCAPE << ANSI::COMMAND::CODE::BEGIN::SEQUENCE_INTRO;
-        for ( size_t index = 0; index < command.codes.size(); ++index )
+        output << ANSI::COMMAND::CODE::BEGIN_CODE;
+        
+        size_t num_commands = command.codes.size();
+        for ( size_t index = 0; index < num_commands; ++index )
         {
             output << (int)command.codes[index];
-            if ( index < command.codes.size() - 1 ) output << ANSI::COMMAND::CODE::DELIMITER;
+            if ( index < num_commands - 1 ) output << ANSI::COMMAND::CODE::DELIMITER;
         }
+        
         output << command.closing_tag;
         return output;
     }

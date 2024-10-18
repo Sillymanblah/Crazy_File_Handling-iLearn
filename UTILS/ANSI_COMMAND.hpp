@@ -49,6 +49,7 @@ namespace ANSI
         FRAME_OPEN = 51,
         FRAME_CLOSE = 54,
     };
+    // enum class EFFECT
 
     // For basic colors, these are stored as an offset integer from the forground/background color mode.
     enum class BASIC_COLOR : int
@@ -77,6 +78,7 @@ namespace ANSI
         BRIGHT_CYAN,
         BRIGHT_WHITE,
     };
+    // enum class BASIC_COLOR
 
     class BYTE_COLOR
     {
@@ -100,6 +102,7 @@ namespace ANSI
             BRIGHT_CYAN,
             BRIGHT_WHITE,
         };
+        // enum BASIC
 
         enum GRAYSCALE : BYTE
         {
@@ -128,6 +131,7 @@ namespace ANSI
             WHITE,
             BRILLIANT_WHITE, // Needed one more name...
         };
+        // enum GRAYSCALE
 
     public:
         BYTE_COLOR( BYTE __value ) : _code(__value) {}
@@ -144,6 +148,7 @@ namespace ANSI
             GREEN_INC       = 6, // Incremental steps for green.
             RED_INC         = 36, // Incremental steps for red.
         };
+        // enum RGB
 
     public:
         /// @brief Function takes a set of values for an RGB code to retrieve a code for the value.
@@ -158,6 +163,7 @@ namespace ANSI
 
         friend class COMMAND;
     };
+    // class BYTE_COLOR
     
     class RGB_COLOR
     {
@@ -173,6 +179,7 @@ namespace ANSI
 
         friend class COMMAND;
     };
+    // class RGB_COLOR
 
     class COMMAND
     {

@@ -16,7 +16,6 @@ using submission_database       =   DB::database<student_id, student_submissions
 using lab_grade     =   number_grade<unsigned char, 100>;
 using lab_grades    =   DB::database<student_username, lab_grade>;
 
-template<>
 header_set lab_grades::determine_headers_manually()
 {
     header_set result; std::string input;
@@ -29,7 +28,7 @@ header_set lab_grades::determine_headers_manually()
 
     return result;
 }
-template<>
+
 header_set student_database::determine_headers_manually()
 {
     header_set result; std::string input;
@@ -41,7 +40,7 @@ header_set student_database::determine_headers_manually()
 
     return result;
 }
-template<>
+
 header_set student_email_database::determine_headers_manually()
 {
     header_set result; std::string input;

@@ -249,16 +249,17 @@ namespace ANSI
     };
     // class COMMAND
 
-    class COMMANDS : public std::vector< COMMAND >
+    class COMMANDS : public std::initializer_list< COMMAND >
     {
-    public:
-        using _MyStorage    = std::vector< COMMAND >;
-        using allocator_type        = typename _MyStorage::allocator_type;
+    private:
+        using _MyStorage    = std::initializer_list< COMMAND >;
 
+    public:
         COMMANDS() : _MyStorage() {}
         COMMANDS( COMMANDS&& __other ) : _MyStorage( std::forward< COMMANDS >( __other ) ) {}
         COMMANDS( const COMMANDS& __other ) : _MyStorage( __other ) {}
-        COMMANDS( std::initializer_list< COMMAND > __command_list ) : _MyStorage( __command_list.begin(), __command_list.end() ) {}
+        COMMANDS( std::initializer_list< COMMAND >&& __command_list ) : _MyStorage( __command_list ) {}
+        COMMANDS( const std::initializer_list< COMMAND >& __command_list ) : _MyStorage( __command_list ) {}
 
         friend std::ostream& operator << ( std::ostream& output, const COMMANDS& commands );
         friend std::ostream& operator << ( std::ostream& output, COMMANDS&& commands );

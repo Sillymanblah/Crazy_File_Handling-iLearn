@@ -50,7 +50,7 @@ namespace ANSI
     }
     std::ostream& operator << ( std::ostream& output, COMMANDS&& commands )
     {
-        for ( COMMAND& command : commands ) output << command;
+        for ( const COMMAND& command : commands ) output << command;
         return output;
     }
 };

@@ -1,143 +1,184 @@
 #ifndef HTML_PARSING_HPP
 #define HTML_PARSING_HPP
 
-#include "../functional_parsing/functional_parsing.hpp"
+// NOTE TO WHOMEVER READS THIS!
+/*
+ - This file was rewritten for the current specific usage but will be completely
+ - overhauled again when I figure out how to improve the functional parsing file.
+ - For the time being this works for what I need it to do.
+*/
 
-#include <map>
+#include <iostream>
+#include <fstream>
 #include <sstream>
+#include <vector>
+#include <limits>
+#include <list>
+#include <map>
 
-// Functions below are for use in parsing the actual file.
+using parsed_strings = std::vector< std::string >;
 
-template <class _Elem>
-bool get_html_block(std::basic_istream<_Elem>& input, std::basic_string<_Elem>& output)
+using submission_info = std::pair< std::string, time_t >;
+
+#define submission_file submission_info.first
+#define submission_time submission_info.second
+
+using submission_list = std::list< std::string >;
+using student_submissions = std::pair< std::string, submission_list >;
+
+#define name student_submissions.first
+#define submissions student_submissions.second
+
+using submission_group = std::vector< student_submissions >;
+
+void read_till_next_command( std::ifstream& file, std::string& out_string )
+{ std::getline( file >> std::ws, out_string, '<' ); }
+
+void skip_to_next_command( std::ifstream& file )
+{ file.ignore( std::numeric_limits< std::streamsize >::max(), '<' ); }
+
+enum class command_type
 {
-    input >> std::ws;
-    if (input.peek() == '<')
+    unk,
+    html,
+    body,
+    table,
+    table_row,
+    table_data,
+    bold,
+
+    end_html = 11,
+    end_body,
+    end_table,
+    end_table_row,
+    end_table_data,
+    end_bold,
+
+    paragraph = 51,
+    font,
+    line_break,
+};
+
+command_type get_end( const command_type& type )
+{
+    switch ( type )
     {
-        if (!std::getline(input.ignore(), output, '>'))
-            return false;
-        output = '<' + output + '>';
-        return true;
+        case command_type::html: return command_type::end_html;
+        case command_type::body: return command_type::end_body;
+        case command_type::table: return command_type::end_table;
+        case command_type::table_data: return command_type::end_table_data;
+        case command_type::table_row: return command_type::end_table_row;
+        case command_type::bold: return command_type::end_bold;
+
+        // Not good, but for now works.
+        default: throw command_type::unk;
     }
-    if (!std::getline(input, output, '<'))
-        return false;
-    input.putback('<');
-    return true;
 }
 
-template <class _Elem>
-bool is_command(const std::basic_string<_Elem>& str)
-{ return str.front() == (_Elem)'<' && str.back() == (_Elem)'>'; }
-
-template <class _Elem>
-bool is_not_command(const std::basic_string<_Elem>& str)
-{ return !is_command(str); }
-
-// The below functions for performing the parsing and collecting the data.
-
-template <class _Elem>
-using basic_submission_set          =   std::vector<basic_parsed_string<_Elem>>;
-template <class _Elem>
-using basic_student_submission_set  =   std::map<std::basic_string<_Elem>, basic_submission_set<_Elem>>;
-
-template <class _Elem>
-std::basic_string<_Elem> parse_table(std::basic_istream<_Elem>& input)
+std::string command_to_string( const command_type& type )
 {
-    basic_parsed_string<_Elem> tables = manual_parse<_Elem> (
-        input,
-        build_string_conditional<_Elem>("<table WIDTH=100% cellpadding=3 cellspacing=0 border=0 bgcolor=white>"),
-        build_string_conditional<_Elem>("</table>"),
-        get_html_block<_Elem>
-    );
-
-    if (tables.size() == 0) throw std::runtime_error("No table was found in the html file!");
-    if (tables.size() > 1) throw std::runtime_error("Got more tables than expected.");
-
-    return tables[0];
-}
-
-template <class _Elem>
-basic_parsed_string<_Elem> parse_non_commands(const std::basic_string<_Elem>& input)
-{
-    std::basic_stringstream<_Elem> buffer(input);
-    basic_parsed_string<_Elem> non_commands = manual_parse<_Elem> (
-        buffer,
-        std::function(is_not_command<_Elem>),
-        std::function(is_command<_Elem>),
-        get_html_block<_Elem>
-    );
-    if (non_commands.size() == 0) throw std::runtime_error("Got zero non-commands, expected at least one...");
-    return non_commands;
-}
-
-template <class _Elem>
-basic_submission_set<_Elem> parse_submissions(const std::basic_string<_Elem>& input)
-{
-    std::basic_stringstream<_Elem> buffer(input);
-    basic_submission_set<_Elem> submissions;
-
-    static const basic_parser<_Elem> find_submissions = build_parser<_Elem> (
-        build_string_conditional<_Elem>("<tr bgcolor=white>"),
-        build_string_conditional<_Elem>("</tr>"),
-        get_html_block<_Elem>
-    );
-
-    for (const std::basic_string<_Elem>& submission : find_submissions(buffer))
-    {        
-        basic_parsed_string<_Elem> submission_info = parse_non_commands<_Elem>(submission);
-        if (submission_info.size() == 0) throw std::runtime_error("Submission with no data found...");
-
-        submissions.push_back(submission_info);
-    }
-    if (submissions.size() == 0) throw std::runtime_error("Failed to find any submissions for the student...");
-
-    return submissions;
-}
-
-template <class _Elem>
-void parse_student_submissions(basic_student_submission_set<_Elem>& student_submissions, const std::basic_string<_Elem>& student_with_submissions)
-{
-    std::basic_string<_Elem> student;
-
-    basic_parsed_string<_Elem> student_information = parse_non_commands<_Elem>(student_with_submissions);
-
-    student = student_information[0];
-    try
+    switch ( type )
     {
-        basic_submission_set<_Elem> submissions = parse_submissions<_Elem>(student_with_submissions);
+        case command_type::html: return "html";
+        case command_type::body: return "body";
+        case command_type::table: return "table";
+        case command_type::table_data: return "tr";
+        case command_type::table_row: return "td";
+        case command_type::bold: return "b";
+        case command_type::paragraph: return "p";
+        case command_type::font: return "font";
+        case command_type::line_break: return "br";
 
-        student_submissions[student] = submissions;
-    }
-    catch(const std::exception& e)
-    {
-        std::throw_with_nested(std::runtime_error(("Failed to get submissions for student " + student).c_str()));
+        case command_type::end_html: return "/html";
+        case command_type::end_body: return "/body";
+        case command_type::end_table: return "/table";
+        case command_type::end_table_data: return "/tr";
+        case command_type::end_table_row: return "/td";
+        case command_type::end_bold: return "/b";
+
+        case command_type::unk: return "";
+
+        // Not good, but for now works.
+        default: throw command_type::unk;
     }
 }
 
-template <class _Elem>
-basic_student_submission_set<_Elem> do_read(std::basic_iostream<_Elem>& input)
+command_type string_to_command( const std::string& type_str )
 {
-    basic_student_submission_set<_Elem> student_submissions;
-    basic_string_conditional<_Elem> student_seperator = build_string_conditional<_Elem>("<tr bgcolor=#AAAAAA>");
-    std::basic_stringstream<_Elem> buffer;
+    if ( type_str == "html" ) return command_type::html;
+    else if ( type_str == "body" ) return command_type::body;
+    else if ( type_str == "table" ) return command_type::table;
+    else if ( type_str == "tr" ) return command_type::table_data;
+    else if ( type_str == "td" ) return command_type::table_row;
+    else if ( type_str == "b" ) return command_type::bold;
 
-    basic_parser<_Elem> find_students = build_parser<_Elem> (
-        student_seperator,
-        student_seperator,
-        get_html_block<_Elem>
+    else if ( type_str == "/html" ) return command_type::end_html;
+    else if ( type_str == "/body" ) return command_type::end_body;
+    else if ( type_str == "/table" ) return command_type::end_table;
+    else if ( type_str == "/tr" ) return command_type::end_table_data;
+    else if ( type_str == "/td" ) return command_type::end_table_row;
+    else if ( type_str == "/b" ) return command_type::end_bold;
+
+    else if ( type_str == "p" ) return command_type::paragraph;
+    else if ( type_str == "font" ) return command_type::font;
+    else if ( type_str == "br" ) return command_type::line_break;
+
+    else return command_type::unk;
+}
+
+parsed_strings break_command( const std::string& command_str )
+{
+    parsed_strings command_parts;
+    std::string part;
+
+    std::stringstream command_stream( command_str );
+
+    while ( command_stream >> part )
+        command_parts.push_back( part );
+
+    return command_parts;
+}
+
+bool command_requires_end( const command_type& type )
+{
+    return !(
+        type == command_type::line_break ||
+        type == command_type::font ||
+        type == command_type::paragraph
     );
+}
 
-    std::basic_string<_Elem> table = parse_table<_Elem>(input);
+void get_table( std::ifstream& file, parsed_strings& table, command_type end_command = command_type::unk )
+{
+    std::string command, table_data;
 
-    buffer = std::basic_stringstream<_Elem>(table);
-    basic_parsed_string<_Elem> students = find_students(buffer);
+    while ( std::getline( file, command, '>' ) )
+    {
+        parsed_strings command_parts = break_command( command );
+        command_type type = string_to_command( command_parts[0] );
+        
+        if ( type == end_command )
+            break;
+        
+        read_till_next_command( file, table_data );
+        if ( table_data != "" )
+            table.push_back( table_data );
+
+        if ( command_requires_end( type ) )
+            get_table( file, table, get_end( type ) );
+    }
     
-    for (size_t index = 0; index < students.size(); ++index)
-    {
-        parse_student_submissions<_Elem>(student_submissions, students[index]);
-    }
+    skip_to_next_command( file );
+}
 
-    return student_submissions;
+parsed_strings html_parser( std::ifstream& file )
+{
+    parsed_strings data;
+
+    skip_to_next_command( file );
+    get_table( file, data );
+
+    return data;
 }
 
 #endif // HTML_PARSING_HPP

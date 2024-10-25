@@ -258,8 +258,8 @@ namespace ANSI
         COMMANDS() : _MyStorage() {}
         COMMANDS( COMMANDS&& __other ) : _MyStorage( std::forward< COMMANDS >( __other ) ) {}
         COMMANDS( const COMMANDS& __other ) : _MyStorage( __other ) {}
-        COMMANDS( std::initializer_list< COMMAND >&& __command_list ) : _MyStorage( __command_list ) {}
-        COMMANDS( const std::initializer_list< COMMAND >& __command_list ) : _MyStorage( __command_list ) {}
+        COMMANDS( _MyStorage&& __command_list ) : _MyStorage( __command_list ) {}
+        COMMANDS( const _MyStorage& __command_list ) : _MyStorage( __command_list ) {}
 
         friend std::ostream& operator << ( std::ostream& output, const COMMANDS& commands );
         friend std::ostream& operator << ( std::ostream& output, COMMANDS&& commands );

@@ -14,6 +14,7 @@
 #include <vector>
 #include <limits>
 #include <list>
+#include <stack>
 #include <map>
 
 using parsed_strings = std::vector< std::string >;
@@ -37,10 +38,9 @@ void read_till_next_command( std::ifstream& file, std::string& out_string )
 void skip_to_next_command( std::ifstream& file )
 { file.ignore( std::numeric_limits< std::streamsize >::max(), '<' ); }
 
-enum class command_type
+enum class command_type : unsigned char
 {
-    unk,
-    html,
+    html = 1,
     body,
     table,
     table_row,
@@ -57,6 +57,8 @@ enum class command_type
     paragraph = 51,
     font,
     line_break,
+
+    unk = 255,
 };
 
 command_type get_end( const command_type& type )
@@ -85,9 +87,6 @@ std::string command_to_string( const command_type& type )
         case command_type::table_data: return "tr";
         case command_type::table_row: return "td";
         case command_type::bold: return "b";
-        case command_type::paragraph: return "p";
-        case command_type::font: return "font";
-        case command_type::line_break: return "br";
 
         case command_type::end_html: return "/html";
         case command_type::end_body: return "/body";
@@ -95,6 +94,10 @@ std::string command_to_string( const command_type& type )
         case command_type::end_table_data: return "/tr";
         case command_type::end_table_row: return "/td";
         case command_type::end_bold: return "/b";
+
+        case command_type::paragraph: return "p";
+        case command_type::font: return "font";
+        case command_type::line_break: return "br";
 
         case command_type::unk: return "";
 
@@ -144,13 +147,15 @@ bool command_requires_end( const command_type& type )
     return !(
         type == command_type::line_break ||
         type == command_type::font ||
-        type == command_type::paragraph
+        type == command_type::paragraph ||
+        type == command_type::unk
     );
 }
 
 // Do not like this recursion, maybe use some kind of stack to track commands.
-void get_table( std::ifstream& file, parsed_strings& table, command_type end_command = command_type::unk )
+void get_table( std::ifstream& file, parsed_strings& table )
 {
+    std::stack< command_type > active_commands;
     std::string command, table_data;
 
     while ( std::getline( file, command, '>' ) )
@@ -158,18 +163,21 @@ void get_table( std::ifstream& file, parsed_strings& table, command_type end_com
         parsed_strings command_parts = break_command( command );
         command_type type = string_to_command( command_parts[0] );
         
-        if ( type == end_command ) // If we have found the end of a command, jump out to previous recursive call at the start of next command
-            break;
+        if ( active_commands.size() > 0 && type == get_end( active_commands.top() ) ) // If we have found the end of a command, jump out to previous recursive call at the start of next command
+        {
+            active_commands.pop();
+            skip_to_next_command( file );
+            continue;
+        }
         
         read_till_next_command( file, table_data ); // Read to the start of the next command for data.
-        if ( table_data != "" )
+
+        if ( table_data.size() > 1 )
             table.push_back( table_data );
 
         if ( command_requires_end( type ) )
-            get_table( file, table, get_end( type ) );
+            active_commands.push( type );
     }
-    
-    skip_to_next_command( file );
 }
 
 parsed_strings html_parser( std::ifstream& file )

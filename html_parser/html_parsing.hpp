@@ -19,19 +19,6 @@
 
 using parsed_strings = std::vector< std::string >;
 
-using submission_info = std::pair< std::string, time_t >;
-
-#define submission_file submission_info.first
-#define submission_time submission_info.second
-
-using submission_list = std::list< std::string >;
-using student_submissions = std::pair< std::string, submission_list >;
-
-#define name student_submissions.first
-#define submissions student_submissions.second
-
-using class_submissions = std::vector< student_submissions >;
-
 void read_till_next_command( std::ifstream& file, std::string& out_string )
 { std::getline( file >> std::ws, out_string, '<' ); }
 

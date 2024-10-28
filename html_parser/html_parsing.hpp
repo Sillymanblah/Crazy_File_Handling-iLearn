@@ -29,7 +29,7 @@ using student_submissions = std::pair< std::string, submission_list >;
 #define name student_submissions.first
 #define submissions student_submissions.second
 
-using submission_group = std::vector< student_submissions >;
+using class_submissions = std::vector< student_submissions >;
 
 void read_till_next_command( std::ifstream& file, std::string& out_string )
 { std::getline( file >> std::ws, out_string, '<' ); }
@@ -148,6 +148,7 @@ bool command_requires_end( const command_type& type )
     );
 }
 
+// Do not like this recursion, maybe use some kind of stack to track commands.
 void get_table( std::ifstream& file, parsed_strings& table, command_type end_command = command_type::unk )
 {
     std::string command, table_data;
@@ -157,10 +158,10 @@ void get_table( std::ifstream& file, parsed_strings& table, command_type end_com
         parsed_strings command_parts = break_command( command );
         command_type type = string_to_command( command_parts[0] );
         
-        if ( type == end_command )
+        if ( type == end_command ) // If we have found the end of a command, jump out to previous recursive call at the start of next command
             break;
         
-        read_till_next_command( file, table_data );
+        read_till_next_command( file, table_data ); // Read to the start of the next command for data.
         if ( table_data != "" )
             table.push_back( table_data );
 

@@ -16,37 +16,37 @@ using basic_parsed_string       =   std::vector<std::basic_string<_Elem>>;
 template <class _Elem>
 using basic_parser              =   std::function<basic_parsed_string<_Elem>(std::basic_istream<_Elem>&)>;
 
-typedef basic_parser<char>      sparser;
-typedef basic_parser<wchar_t>   wsparser;
+using sparser               = basic_parser<char>;
+using wsparser              = basic_parser<wchar_t>;
 #ifdef __cpp_lib_char8_t
-typedef basic_parser<char8_t>   u8sparser;
+using u8sparser             = basic_parser<char8_t>;
 #endif // __cpp_lib_char8_t
-typedef basic_parser<char16_t>  u16sparser;
-typedef basic_parser<char32_t>  u32sparser;
+using u16sparser            = basic_parser<char16_t>;
+using u32sparser            = basic_parser<char32_t>;
 
-typedef basic_reader<char>      sreader;
-typedef basic_reader<wchar_t>   wsreader;
+using sreader               = basic_reader<char>;
+using wsreader              = basic_reader<wchar_t>;
 #ifdef __cpp_lib_char8_t
-typedef basic_reader<char8_t>   u8sreader;
+using u8sreader             = basic_reader<char8_t>;
 #endif // __cpp_lib_char8_t
-typedef basic_reader<char16_t>  u16sreader;
-typedef basic_reader<char32_t>  u32sreader;
+using u16sreader            = basic_reader<char16_t>;
+using u32sreader            = basic_reader<char32_t>;
 
-typedef basic_parsed_string<char>      parsed_string;
-typedef basic_parsed_string<wchar_t>   parsed_wstring;
+using parsed_string         = basic_parsed_string<char>;
+using parsed_wstring        = basic_parsed_string<wchar_t>;
 #ifdef __cpp_lib_char8_t
-typedef basic_parsed_string<char8_t>   parsed_u8string;
+using parsed_u8string       = basic_parsed_string<char8_t>;
 #endif // __cpp_lib_char8_t
-typedef basic_parsed_string<char16_t>  parsed_u16string;
-typedef basic_parsed_string<char32_t>  parsed_u32string;
+using parsed_u16string      = basic_parsed_string<char16_t>;
+using parsed_u32string      = basic_parsed_string<char32_t>;
 
-typedef basic_string_conditional<char>      string_conditional;
-typedef basic_string_conditional<wchar_t>   wstring_conditional;
+using string_conditional    = basic_string_conditional<char>;
+using wstring_conditional   = basic_string_conditional<wchar_t>;
 #if __cpp_lib_char8_t
-typedef basic_string_conditional<char8_t>   u8string_conditional;
+using u8string_conditional  = basic_string_conditional<char8_t>;
 #endif
-typedef basic_string_conditional<char16_t>  u16string_conditional;
-typedef basic_string_conditional<char32_t>  u32string_conditional;
+using u16string_conditional = basic_string_conditional<char16_t>;
+using u32string_conditional = basic_string_conditional<char32_t>;
 
 
 template <class _Elem>
@@ -100,7 +100,7 @@ basic_parser<_Elem> build_parser
 }
 
 template <class _Elem, class _Pr = std::equal_to<std::basic_string<_Elem>>>
-basic_string_conditional<_Elem> build_string_conditional(const std::basic_string<_Elem>& lookup)
+basic_string_conditional<_Elem> build_string_conditional( const std::basic_string<_Elem>& lookup )
 {
     return [lookup](const std::basic_string<_Elem>& value)
     {

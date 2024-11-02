@@ -148,15 +148,18 @@ std::string time::get_month( const short_time& __month )
 std::string time::get_short_month( const short_time& __month )
 { return get_month( __month ).substr( 0, 3 ); }
 
+time::short_time time::military_to_standard( const short_time& __hour )
+{ return (__hour + 11) % 12 + 1; }
+
 std::string time::construct_time_string( const time_breakdown& __parts )
 {
-    using std::to_string;
     const auto& [ year, month, day, hour, minute ] = __parts;
 
     short_time val = -1;
 
+    using std::to_string;
     return get_short_month( month ) + ' ' + to_string( day + 1 )
-        + ", " + to_string( year ) + ' ' + to_string( (hour + 11) % 12 + 1 )
+        + ", " + to_string( year ) + ' ' + to_string( military_to_standard( hour ) )
         + ':' + to_string( minute ) + ' ' + get_am_pm( hour );
 }
 

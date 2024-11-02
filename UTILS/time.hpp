@@ -86,6 +86,7 @@ private:
     constexpr static inline std::string get_am_pm( const short_time& __hour );
     constexpr static inline std::string get_month( const short_time& __month );
     static inline std::string get_short_month( const short_time& __month );
+    constexpr static inline short_time military_to_standard( const short_time& __hour );
     static inline std::string construct_time_string( const time_breakdown& __parts );
 
     static inline short_time days_before_month( const short_time& month );

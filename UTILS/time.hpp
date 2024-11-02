@@ -65,7 +65,8 @@ private:
 
     constexpr static inline short_time find_month( short_time& __days );
     constexpr static inline void break_raw_time( const raw_time& __time, const precision& __precision, time_breakdown& __parts );
-    constexpr static inline short_time build_time( const time_breakdown& __parts );
+    constexpr static inline time_value place_part( const short_time& __part, const byte& __bitshift = no_shift );
+    constexpr static inline time_value build_time( const time_breakdown& __parts );
 
 public:
     void set_time( const raw_time& __time, const precision& __precision = precision::seconds );

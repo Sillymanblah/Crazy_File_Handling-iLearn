@@ -73,8 +73,11 @@ void time::break_raw_time( const raw_time& __time, const precision& __precision,
     }
 }
 
-time::short_time time::build_time( const time_breakdown& __parts )
-{ return __parts[ breakdown_year ] << year_shift | __parts[ breakdown_month ] << month_shift | __parts[ breakdown_day ] << day_shift | __parts[ breakdown_hour ] << hour_shift | __parts[ breakdown_minute ]; }
+time::time_value time::place_part( const short_time& __part, const byte& __bitshift )
+{ return static_cast< time_value >( __part ) << __bitshift; }
+
+time::time_value time::build_time( const time_breakdown& __parts )
+{ return place_part( __parts[ breakdown_year ], year_shift ) | place_part( __parts[ breakdown_month ], month_shift ) | place_part( __parts[ breakdown_day ], day_shift ) | place_part( __parts[ breakdown_hour ], hour_shift ) | place_part( __parts[ breakdown_minute ] ); }
 
 void time::set_time( const raw_time& __time, const precision& __precision )
 {

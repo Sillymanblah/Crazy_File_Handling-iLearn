@@ -7,104 +7,130 @@
 #include <string>
 #include <vector>
 
-template <class _Elem>
-using basic_string_conditional  =   std::function<bool(const std::basic_string<_Elem>&)>;
-template <class _Elem>
-using basic_reader              =   std::function<bool(std::basic_istream<_Elem>&, std::basic_string<_Elem>&)>;
-template <class _Elem>
-using basic_parsed_string       =   std::vector<std::basic_string<_Elem>>;
-template <class _Elem>
-using basic_parser              =   std::function<basic_parsed_string<_Elem>(std::basic_istream<_Elem>&)>;
+template < class _Elem >
+using basic_string_conditional  =   bool (*)( const std::basic_string< _Elem >& );
+template < class _Elem >
+using basic_reader              =   bool (*)( std::basic_istream< _Elem >&, std::basic_string< _Elem >& );
+template < class _Elem >
+using basic_parsed_string       =   std::vector< std::basic_string< _Elem > >;
+template < class _Elem >
+using basic_parser              =   basic_parsed_string< _Elem > (*)( std::basic_istream< _Elem >& );
 
-typedef basic_parser<char>      sparser;
-typedef basic_parser<wchar_t>   wsparser;
+using sparser                   = basic_parser< char >;
+using wsparser                  = basic_parser< wchar_t >;
 #ifdef __cpp_lib_char8_t
-typedef basic_parser<char8_t>   u8sparser;
+using u8sparser                 = basic_parser< char8_t >;
 #endif // __cpp_lib_char8_t
-typedef basic_parser<char16_t>  u16sparser;
-typedef basic_parser<char32_t>  u32sparser;
+using u16sparser                = basic_parser< char16_t >;
+using u32sparser                = basic_parser< char32_t >;
 
-typedef basic_reader<char>      sreader;
-typedef basic_reader<wchar_t>   wsreader;
+using sreader                   = basic_reader< char >;
+using wsreader                  = basic_reader< wchar_t >;
 #ifdef __cpp_lib_char8_t
-typedef basic_reader<char8_t>   u8sreader;
+using u8sreader                 = basic_reader< char8_t >;
 #endif // __cpp_lib_char8_t
-typedef basic_reader<char16_t>  u16sreader;
-typedef basic_reader<char32_t>  u32sreader;
+using u16sreader                = basic_reader< char16_t >;
+using u32sreader                = basic_reader< char32_t >;
 
-typedef basic_parsed_string<char>      parsed_string;
-typedef basic_parsed_string<wchar_t>   parsed_wstring;
+using parsed_string             = basic_parsed_string< char >;
+using parsed_wstring            = basic_parsed_string< wchar_t >;
 #ifdef __cpp_lib_char8_t
-typedef basic_parsed_string<char8_t>   parsed_u8string;
+using parsed_u8string           = basic_parsed_string< char8_t >;
 #endif // __cpp_lib_char8_t
-typedef basic_parsed_string<char16_t>  parsed_u16string;
-typedef basic_parsed_string<char32_t>  parsed_u32string;
+using parsed_u16string          = basic_parsed_string< char16_t >;
+using parsed_u32string          = basic_parsed_string< char32_t >;
 
-typedef basic_string_conditional<char>      string_conditional;
-typedef basic_string_conditional<wchar_t>   wstring_conditional;
+using string_conditional        = basic_string_conditional< char >;
+using wstring_conditional       = basic_string_conditional< wchar_t >;
 #if __cpp_lib_char8_t
-typedef basic_string_conditional<char8_t>   u8string_conditional;
+using u8string_conditional      = basic_string_conditional< char8_t >;
 #endif
-typedef basic_string_conditional<char16_t>  u16string_conditional;
-typedef basic_string_conditional<char32_t>  u32string_conditional;
+using u16string_conditional     = basic_string_conditional< char16_t >;
+using u32string_conditional     = basic_string_conditional< char32_t >;
 
 
-template <class _Elem>
-basic_parsed_string<_Elem> manual_parse
+template < class _Elem >
+basic_parsed_string< _Elem > basic_parse
 (
-    std::basic_istream<_Elem>& input,
-    basic_string_conditional<_Elem> start,
-    basic_string_conditional<_Elem> stop,
-    basic_reader<_Elem> reader
+    std::basic_istream< _Elem >& input,
+    basic_string_conditional< _Elem > start,
+    basic_string_conditional< _Elem > stop,
+    basic_reader< _Elem > reader
 )
 {
     size_t current_position = 0; // If the functions are the same, we have to start parsing the next immediately.
-    std::basic_string<_Elem> output, bucket = "";
-    basic_parsed_string<_Elem> parsed;
+    std::basic_string< _Elem > output, bucket = "";
+    basic_parsed_string< _Elem > parsed;
 
     bool is_reading = false;
 
-    while (reader(input, output))
+    while ( reader( input, output ) )
     {
-        if (is_reading)
+        if ( is_reading )
         {
-            is_reading = !stop(output);
+            is_reading = !stop( output );
 
             if (!is_reading)
             {
-                parsed.push_back(bucket);
-                bucket = "";
+                parsed.push_back( bucket );
+                bucket.clear();
             }
         }
-        if (!is_reading)
+        if ( !is_reading )
         {
-            is_reading = start(output);
+            is_reading = start( output );
         }
-        if (is_reading) bucket += output;
+        if ( is_reading ) bucket += output;
     }
-    if (bucket.size()) parsed.push_back(bucket);
+    if ( bucket.size() ) parsed.push_back( bucket );
 
     return parsed;
 }
 
-template <class _Elem>
-basic_parser<_Elem> build_parser
+constexpr auto& parse = basic_parse< char >;
+constexpr auto& wparse = basic_parse< wchar_t >;
+#ifdef __cpp_lib_char8_t
+constexpr auto& u8parse = build_basic_parser< char8_t >;
+#endif // __cpp_lib_char8_t
+constexpr auto& u16parse = basic_parse< char16_t >;
+constexpr auto& u32parse = basic_parse< char32_t >;
+
+template < class _Elem >
+basic_parser< _Elem > build_basic_parser
 (
-    basic_string_conditional<_Elem> start,
-    basic_string_conditional<_Elem> stop,
-    basic_reader<_Elem> reader
+    basic_string_conditional< _Elem > start,
+    basic_string_conditional< _Elem > stop,
+    basic_reader< _Elem > reader
 )
 {
-    return [start, stop, reader](std::basic_istream<_Elem>& input)
-    { return manual_parse(input, start, stop, reader); };
+    return [ start, stop, reader ]( std::basic_istream< _Elem >& input )
+    { return basic_parse(input, start, stop, reader); };
 }
 
-template <class _Elem, class _Pr = std::equal_to<std::basic_string<_Elem>>>
-basic_string_conditional<_Elem> build_string_conditional(const std::basic_string<_Elem>& lookup)
+constexpr auto& build_parser = build_basic_parser< char >;
+constexpr auto& build_wparser = build_basic_parser< wchar_t >;
+#ifdef __cpp_lib_char8_t
+constexpr auto& build_u8parser = build_basic_parser< char8_t >;
+#endif // __cpp_lib_char8_t
+constexpr auto& build_u16parser = build_basic_parser< char16_t >;
+constexpr auto& build_u32parser = build_basic_parser< char32_t >;
+
+template < class _Elem, class _Pr = std::equal_to< std::basic_string< _Elem > > >
+basic_string_conditional< _Elem > build_basic_string_conditional( std::basic_string< _Elem > lookup )
 {
-    return [lookup](const std::basic_string<_Elem>& value)
-    {
-        _Pr comparer;
-        return comparer(value, lookup);
-    };
+    return [ lookup ]( const std::basic_string< _Elem >& value )
+    { return _Pr( value, lookup ); };
 }
+
+template < class _Pr = std::equal_to< std::string > >
+constexpr auto& build_string_conditional = build_basic_string_conditional< char, _Pr >;
+template < class _Pr = std::equal_to< std::wstring > >
+constexpr auto& build_wstring_conditional = build_basic_string_conditional< wchar_t, _Pr >;
+#ifdef __cpp_lib_char8_t
+template < class _Pr = std::equal_to< std::u8string > >
+constexpr auto& build_u8string_conditional = build_basic_string_conditional< char8_t, _Pr >;
+#endif // __cpp_lib_char8_t
+template < class _Pr = std::equal_to< std::u16string > >
+constexpr auto& build_u16string_conditional = build_basic_string_conditional< char16_t, _Pr >;
+template < class _Pr = std::equal_to< std::u32string > >
+constexpr auto& build_u32string_conditional = build_basic_string_conditional< char32_t, _Pr >;

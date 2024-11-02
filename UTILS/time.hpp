@@ -57,6 +57,7 @@ public:
     time( time_value&& __time ) : _time( __time ) {}
 
 private:
+    // These 3 functions are unused!
     // This is technically a compile time constant if we know year.
     constexpr static inline bool is_leap_year( short_time __year );
     constexpr static inline short_time get_days_in_year( short_time __year );
@@ -82,13 +83,13 @@ public:
     short_time get_time( const precision& __precision );
 
 private:
-    static inline std::string get_am_pm( short_time __hour );
-    static inline std::string get_month( short_time __month );
-    static inline std::string get_short_month( short_time __month );
-    static inline std::string construct_time_string( const time_breakdown&& __parts );
+    constexpr static inline std::string get_am_pm( const short_time& __hour );
+    constexpr static inline std::string get_month( const short_time& __month );
+    static inline std::string get_short_month( const short_time& __month );
+    static inline std::string construct_time_string( const time_breakdown& __parts );
 
-    static inline short_time days_before_month( short_time month );
-    static inline raw_time construct_raw_time( const time_breakdown&& __parts, const precision& __precision );
+    static inline short_time days_before_month( const short_time& month );
+    static inline raw_time construct_raw_time( const time_breakdown& __parts, const precision& __precision );
 
     static inline time_breakdown break_time( const time_value& __time );
 

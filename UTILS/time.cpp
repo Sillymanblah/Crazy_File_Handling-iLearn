@@ -119,13 +119,13 @@ time::short_time time::get_time( const precision& __precision )
     }
 }
 
-std::string time::get_am_pm( short_time __hour )
+std::string time::get_am_pm( const short_time& __hour )
 {
     if ( __hour < 12 ) return "AM";
     else return "PM";
 }
 
-std::string time::get_month( short_time __month )
+std::string time::get_month( const short_time& __month )
 {
     switch ( __month )
     {
@@ -145,20 +145,22 @@ std::string time::get_month( short_time __month )
     }
 }
 
-std::string time::get_short_month( short_time __month )
+std::string time::get_short_month( const short_time& __month )
 { return get_month( __month ).substr( 0, 3 ); }
 
-std::string time::construct_time_string( const time_breakdown&& __parts )
+std::string time::construct_time_string( const time_breakdown& __parts )
 {
     using std::to_string;
     const auto& [ year, month, day, hour, minute ] = __parts;
 
+    short_time val = -1;
+
     return get_short_month( month ) + ' ' + to_string( day + 1 )
-        + ", " + to_string( year ) + ' ' + to_string( (hour - 1) % 12 + 1 )
+        + ", " + to_string( year ) + ' ' + to_string( (hour + 11) % 12 + 1 )
         + ':' + to_string( minute ) + ' ' + get_am_pm( hour );
 }
 
-time::short_time time::days_before_month( short_time __month )
+time::short_time time::days_before_month( const short_time& __month )
 {
     short_time total_days = 0;
     for ( short_time month = 0; month < __month; ++month )
@@ -166,7 +168,7 @@ time::short_time time::days_before_month( short_time __month )
     return total_days;
 }
 
-time::raw_time time::construct_raw_time( const time_breakdown&& __parts, const precision& __precision )
+time::raw_time time::construct_raw_time( const time_breakdown& __parts, const precision& __precision )
 {
     raw_time time_val = 0;
     const auto& [ year, month, day, hour, minute ] = __parts;

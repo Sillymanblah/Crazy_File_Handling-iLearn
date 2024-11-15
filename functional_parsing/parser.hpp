@@ -23,11 +23,11 @@ public:
     parser( const parser& );
     parser( parser&& );
 
-    parse( _Stream& __filestream );
+    _Storage parse( _Stream& __filestream );
 
-    parse( const std::string& __filename );
-    parse( std::string&& __filename );
-    parse( const char* __filename );
+    _Storage parse( const std::string& __filename );
+    _Storage parse( std::string&& __filename );
+    _Storage parse( const char* __filename );
 
 private:
     read_function* readers;

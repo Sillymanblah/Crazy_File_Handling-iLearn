@@ -32,7 +32,7 @@ public:
 private:
     read_function* readers;
     skip_function skipper;
-    conversion_function< _Types... > converters[ sizeof( _Types... ) ];
+    std::tuple< conversion_function< _Types >... > converters;
     store_function push_value;
     union emplace
     {

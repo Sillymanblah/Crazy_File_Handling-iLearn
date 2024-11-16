@@ -1,3 +1,6 @@
+#pragma once
+#ifndef PARSER_HPP
+#define PARSER_HPP
 
 #include <fstream>
 
@@ -40,6 +43,6 @@ private:
     skip_function skipper;
     conversion_functions converters;
     store_function push_value;
-
 };
 
+#endif // PARSER_HPP

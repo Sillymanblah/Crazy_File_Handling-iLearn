@@ -14,24 +14,20 @@ public:
     template < class _Ty > // Enforce that the type here is contained in (_Types...).
     using conversion_function = std::enable_if< std::__is_one_of< _Ty, _Types... >::value, _Ty > (*)( const _MyString& );
     using conversion_functions = std::tuple< conversion_function< _Types >... >;
-
     using store_function = void (*)( _Storage, _Types... );
-    using emplace_function = void (*)( _Storage, _Types... );
-    using new_emplace_function = typename _Storage::value_type& (*)( _Storage, _Types... );
 
 public:
     parser() = default;
     parser( const parser& );
     parser( parser&& );
 
-    void add_reader( read_function fn );
-    void add_skipper( skip_function fn );
+    void add_reader( read_function __reader );
+    void add_skipper( skip_function __skipper );
     template < class _Ty >
-    void add_converter( conversion_function< _Ty > fn, size_t index = sizeof( _Types... ) );
-    void add_converters( conversion_functions fns );
-    void add_pusher( store_function fn );
-    void add_emplacer( emplace_function fn );
-    void add_emplacer( new_emplace_function fn );
+    void add_converter( conversion_function< _Ty > __converter, size_t __index = sizeof( _Types... ) );
+    void add_converters( conversion_function< _Types >... __converters );
+    void add_converters( conversion_functions __converters );
+    void add_pusher( store_function __pusher );
 
     _Storage parse( _MyStream& __filestream );
 
@@ -44,11 +40,6 @@ private:
     skip_function skipper;
     conversion_functions converters;
     store_function push_value;
-    union emplace
-    {
-        new_emplace_function new_fn;
-        emplace_function old_fn;
-    } emplace_value;
 
 };
 

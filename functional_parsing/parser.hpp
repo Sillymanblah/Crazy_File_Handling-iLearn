@@ -15,13 +15,21 @@ public:
     using conversion_function = _Ty (*)( const _MyString& );
     using store_function = void (*)( _Storage, _Types... );
     using emplace_function = void (*)( _Storage, _Types... );
-    template < class _Ty > // Enforce that the type here is the type inside of (_Storage).
-    using new_emplace_function = _Ty& (*)( _Storage, _Types... );
+    using new_emplace_function = typename _Storage::value_type& (*)( _Storage, _Types... );
 
 public:
     parser() = default;
     parser( const parser& );
     parser( parser&& );
+
+    void add_reader( read_function fn );
+    void add_skipper( skip_function fn );
+    template < class _Ty >
+    void add_converter( conversion_function< _Ty > fn, size_t index = sizeof( _Types... ) );
+    void add_converters( std::tuple< conversion_function< _Types >... > fns );
+    void add_pusher( store_function fn );
+    void add_emplacer( emplace_function fn );
+    void add_emplacer( new_emplace_function fn );
 
     _Storage parse( _MyStream& __filestream );
 
@@ -36,7 +44,7 @@ private:
     store_function push_value;
     union emplace
     {
-        new_emplace_function< typename _Storage::value_type > new_fn;
+        new_emplace_function new_fn;
         emplace_function old_fn;
     } emplace_value;
 

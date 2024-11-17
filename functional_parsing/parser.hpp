@@ -50,4 +50,9 @@ private:
     store_function push_value;
 };
 
+template < class _Storage, class... _Types >
+using parser = basic_parser< char, _Storage, _Types... >;
+template < class _Storage, class... _Types >
+using wparser = basic_parser< wchar_t, _Storage, _Types... >;
+
 #endif // PARSER_HPP

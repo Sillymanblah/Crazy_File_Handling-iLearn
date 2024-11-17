@@ -21,8 +21,10 @@ public:
 
 public:
     parser() = default;
-    parser( const parser& );
-    parser( parser&& );
+    parser( const parser& ) = default;
+    parser( parser&& ) = default;
+    parser( read_function __reader, skip_function __skipper, store_function __pusher, conversion_functions __converters );
+    parser( read_function __reader, skip_function __skipper, store_function __pusher, conversion_function< _Types >... __converters );
 
     void add_reader( read_function __reader );
     void add_skipper( skip_function __skipper );

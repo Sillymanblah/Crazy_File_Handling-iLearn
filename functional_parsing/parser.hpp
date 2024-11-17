@@ -5,12 +5,13 @@
 #include <fstream>
 
 template < class _Elem, class _Storage, class... _Types >
-class parser
+class basic_parser
 {
-public:
-    using _MyStream = std::basic_fstream< _Elem >;
+private:
+    using _MyStream = std::basic_ifstream< _Elem >;
     using _MyString = std::basic_string< _Elem >;
 
+public:
     using read_function = _MyStream& (*)( _MyStream&, _MyString& );
     using skip_function = _MyStream& (*)( _MyStream& );
 

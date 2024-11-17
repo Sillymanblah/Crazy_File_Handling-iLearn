@@ -14,6 +14,25 @@ private:
     using _MyStream = std::basic_ifstream< _Elem >;
     using _MyString = std::basic_string< _Elem >;
 
+    template < class _Fn >
+    class function_set
+    {
+    public:
+        inline const size_t& size() { return count; }
+        inline constexpr size_t max_size() { return functions.size(); }
+
+        inline bool is_full() { return count == functions.size(); }
+        inline bool is_empty() { return count == 0; }
+
+        const _Fn& at( size_t __index ) { return functions.at( __index ); }
+        void append_function( _Fn __function ) { if ( !is_full() ) functions[ count++ ] = __function; }
+        void pop_function() { if ( !is_empty() ) functions[ --count ] = static_cast< _Fn >( NULL ); }
+
+    private:
+        std::array< _Fn, num_types > functions;
+        size_t count = 0;
+    };
+
 public:
     using storage = _Storage;
 
@@ -47,8 +66,8 @@ public:
     _Storage parse( const char* __filename );
 
 private:
-    read_function* readers;
-    skip_function skipper;
+    function_set< read_function > readers;
+    function_set< skip_function > skippers;
     conversion_functions converters;
     store_function push_value;
 };

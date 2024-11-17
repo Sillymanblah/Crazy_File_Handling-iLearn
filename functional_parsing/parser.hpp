@@ -12,13 +12,15 @@ private:
     using _MyString = std::basic_string< _Elem >;
 
 public:
+    using storage = _Storage;
+
     using read_function = _MyStream& (*)( _MyStream&, _MyString& );
     using skip_function = _MyStream& (*)( _MyStream& );
 
     template < class _Ty > // Enforce that the type here is contained in (_Types...).
-    using conversion_function = std::enable_if< std::__is_one_of< _Ty, _Types... >::value, _Ty > (*)( const _MyString& );
+    using conversion_function = std::enable_if_t< std::__is_one_of< _Ty, _Types... >::value, _Ty > (*)( const _MyString& );
     using conversion_functions = std::tuple< conversion_function< _Types >... >;
-    using store_function = void (*)( _Storage, _Types... );
+    using store_function = void (*)( _Storage&, const _Types&... );
 
 public:
     parser() = default;

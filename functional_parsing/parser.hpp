@@ -8,6 +8,9 @@ template < class _Elem, class _Storage, class... _Types >
 class basic_parser
 {
 private:
+    static constexpr inline size_t num_types = sizeof( _Types... );
+
+private:
     using _MyStream = std::basic_ifstream< _Elem >;
     using _MyString = std::basic_string< _Elem >;
 
@@ -32,7 +35,7 @@ public:
     void add_reader( read_function __reader );
     void add_skipper( skip_function __skipper );
     template < class _Ty >
-    void add_converter( conversion_function< _Ty > __converter, size_t __index = sizeof( _Types... ) );
+    void add_converter( conversion_function< _Ty > __converter, size_t __index = num_types );
     void add_converters( conversion_function< _Types >... __converters );
     void add_converters( conversion_functions __converters );
     void add_pusher( store_function __pusher );

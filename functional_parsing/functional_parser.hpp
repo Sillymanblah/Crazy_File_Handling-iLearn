@@ -1,16 +1,16 @@
 #pragma once
-#ifndef PARSER_HPP
-#define PARSER_HPP
+#ifndef FUNCTIONAL_PARSER_HPP
+#define FUNCTIONAL_PARSER_HPP
 
 #include <fstream>
 #include <array>
 #include <tuple>
 
 template < class _Elem, class _Storage, class... _Types >
-class basic_parser
+class basic_functional_parser
 {
 private:
-    static constexpr inline size_t num_types = sizeof( _Types... );
+    static constexpr inline size_t num_types = sizeof...( _Types );
 
 private:
     using _MyStream = std::basic_ifstream< _Elem >;
@@ -47,18 +47,18 @@ public:
     using store_function = void (*)( _Storage&, const _Types&... );
 
 public:
-    parser() = default;
-    parser( const parser& ) = default;
-    parser( parser&& ) = default;
-    parser( read_function __reader, skip_function __skipper, store_function __pusher, conversion_functions __converters );
-    parser( read_function __reader, skip_function __skipper, store_function __pusher, conversion_function< _Types >... __converters );
+    basic_functional_parser() = default;
+    basic_functional_parser( const basic_functional_parser& ) = default;
+    basic_functional_parser( basic_functional_parser&& ) = default;
+    basic_functional_parser( read_function __reader, skip_function __skipper, store_function __pusher, conversion_functions __converters );
+    basic_functional_parser( read_function __reader, skip_function __skipper, store_function __pusher, conversion_function< _Types >... __converters );
 
     void add_reader( read_function __reader ) { this->readers.append_function( __reader ); }
     void add_skipper( skip_function __skipper ) { this->skippers.append_function( __skipper ); }
     
-    template < class _Ty, size_t _Index >
-    void add_converter( conversion_function< _Ty > __converter )
-    { ( std::get< ( _Index < num_types ) ? _Index : _Ty > )( converters ) = __converter; }
+    template < size_t _Index >
+    void add_converter( conversion_function< conversion_functions:: > __converter )
+    { ( constexpr ( _Index < num_types ) ? std::get< _Index > : std::get< _Ty > )( converters ) = __converter; }
     void add_converters( conversion_function< _Types >... __converters )
     { converters = std::make_tuple( __converters ); }
     void add_converters( conversion_functions __converters )
@@ -67,7 +67,6 @@ public:
     { push_value = __pusher; }
 
     _Storage parse( _MyStream& __filestream );
-
     _Storage parse( const std::string& __filename );
     _Storage parse( std::string&& __filename );
     _Storage parse( const char* __filename );
@@ -80,8 +79,8 @@ private:
 };
 
 template < class _Storage, class... _Types >
-using parser = basic_parser< char, _Storage, _Types... >;
+using functional_parser = basic_functional_parser< char, _Storage, _Types... >;
 template < class _Storage, class... _Types >
-using wparser = basic_parser< wchar_t, _Storage, _Types... >;
+using functional_wparser = basic_functional_parser< wchar_t, _Storage, _Types... >;
 
-#endif // PARSER_HPP
+#endif // FUNCTIONAL_PARSER_HPP

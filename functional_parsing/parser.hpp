@@ -3,6 +3,8 @@
 #define PARSER_HPP
 
 #include <fstream>
+#include <array>
+#include <tuple>
 
 template < class _Elem, class _Storage, class... _Types >
 class basic_parser
@@ -51,13 +53,18 @@ public:
     parser( read_function __reader, skip_function __skipper, store_function __pusher, conversion_functions __converters );
     parser( read_function __reader, skip_function __skipper, store_function __pusher, conversion_function< _Types >... __converters );
 
-    void add_reader( read_function __reader );
-    void add_skipper( skip_function __skipper );
-    template < class _Ty >
-    void add_converter( conversion_function< _Ty > __converter, size_t __index = num_types );
-    void add_converters( conversion_function< _Types >... __converters );
-    void add_converters( conversion_functions __converters );
-    void add_pusher( store_function __pusher );
+    void add_reader( read_function __reader ) { this->readers.append_function( __reader ); }
+    void add_skipper( skip_function __skipper ) { this->skippers.append_function( __skipper ); }
+    
+    template < class _Ty, size_t _Index >
+    void add_converter( conversion_function< _Ty > __converter )
+    { ( std::get< ( _Index < num_types ) ? _Index : _Ty > )( converters ) = __converter; }
+    void add_converters( conversion_function< _Types >... __converters )
+    { converters = std::make_tuple( __converters ); }
+    void add_converters( conversion_functions __converters )
+    { converters = __converters; }
+    void add_pusher( store_function __pusher )
+    { push_value = __pusher; }
 
     _Storage parse( _MyStream& __filestream );
 
